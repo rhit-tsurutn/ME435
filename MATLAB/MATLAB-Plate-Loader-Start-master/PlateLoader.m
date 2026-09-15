@@ -37,6 +37,43 @@ classdef PlateLoader < hgsetget
             %   Maybe use the GRIPPER_STATUS command and ready string reply
             obj.isPlatePresent = false;
         end
+        function response = specialMove(obj)
+            writeline(obj.serialRobot,'X-AXIS 1');
+            readline(obj.serialRobot);
+            writeline(obj.serialRobot,'GRIPPER OPEN');
+            readline(obj.serialRobot);
+            writeline(obj.serialRobot,'Z-AXIS EXTEND');
+            readline(obj.serialRobot);
+            writeline(obj.serialRobot,'GRIPPER CLOSE');
+            readline(obj.serialRobot);
+            writeline(obj.serialRobot,'Z-AXIS RETRACT');
+            readline(obj.serialRobot);
+            writeline(obj.serialRobot,'X-AXIS 3');
+            readline(obj.serialRobot);
+            writeline(obj.serialRobot,'Z-AXIS EXTEND');
+            readline(obj.serialRobot);
+            writeline(obj.serialRobot,'GRIPPER OPEN');
+            readline(obj.serialRobot);
+            writeline(obj.serialRobot,'Z-AXIS RETRACT');
+            readline(obj.serialRobot);
+            writeline(obj.serialRobot,'GRIPPER CLOSE');
+            readline(obj.serialRobot);
+            writeline(obj.serialRobot,'X-AXIS 5');
+            readline(obj.serialRobot);
+            writeline(obj.serialRobot,'GRIPPER OPEN');
+            readline(obj.serialRobot);
+            writeline(obj.serialRobot,'Z-AXIS EXTEND');
+            readline(obj.serialRobot);
+            writeline(obj.serialRobot,'GRIPPER CLOSE');
+            readline(obj.serialRobot);
+            writeline(obj.serialRobot,'Z-AXIS RETRACT');
+            readline(obj.serialRobot);
+            writeline(obj.serialRobot,'X-AXIS 3');
+            readline(obj.serialRobot);
+            writeline(obj.serialRobot,'GRIPPER OPEN');
+            readline(obj.serialRobot);
+            response = 'READY';
+        end
         function response = reset(obj)
             % Reset robot
             writeline(obj.serialRobot,'RESET');

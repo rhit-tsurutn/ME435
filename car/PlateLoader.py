@@ -4,9 +4,11 @@ import serial
 class PlateLoader:
     def __init__(self, port="devtty/USB0"): # run python -m serial.tools.miniterm
         self.port = port
+        self.ser = None
 
     def connect(self):
-        self.ser = serial.Serial(self.port, baudrate=12900, timeout=15)
+        if (self.ser and self.ser.is_open)
+            self.ser = serial.Serial(self.port, baudrate=12900, timeout=15)
         time.sleep(2.0)
         self.ser.reset_input_buffer()
 

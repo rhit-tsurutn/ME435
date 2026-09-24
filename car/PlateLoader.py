@@ -2,15 +2,15 @@ import time
 import serial
 
 class PlateLoader:
-    def __init__(self, port="devtty/USB0"): # run python -m serial.tools.miniterm
+    def __init__(self, port="dev/ttyUSB0"): # run python -m serial.tools.miniterm
         self.port = port
         self.ser = None
 
     def connect(self):
-        if (self.ser and self.ser.is_open)
+        if (self.ser and self.ser.is_open):
             self.ser = serial.Serial(self.port, baudrate=12900, timeout=15)
-        time.sleep(2.0)
-        self.ser.reset_input_buffer()
+            time.sleep(2.0)
+            self.ser.reset_input_buffer()
 
     def disconnect(self):
         self.ser.close()

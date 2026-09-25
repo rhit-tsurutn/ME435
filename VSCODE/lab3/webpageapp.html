@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plate Loader XP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* Classic Windows XP Tahoma Font */
+        @import url('https://fonts.googleapis.com/css2?family=Tahoma:wght@400;700&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Tahoma', sans-serif;
+            overflow-x: hidden;
+            /* Bliss-inspired background */
+            background: linear-gradient(to bottom, #2989cc 0%, #68bce8 60%, #5cb338 60.1%, #409623 100%);
+        }
+
+        /* Classic Luna Theme Window */
+        .xp-window {
+            background-color: #ECE9D8;
+            border-radius: 8px 8px 0 0;
+            border: 3px solid #0053E5;
+            box-shadow: 2px 4px 10px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Glossy Blue Title Bar */
+        .xp-titlebar {
+            background: linear-gradient(to bottom, #0058EE 0%, #3593FF 8%, #288EFF 40%, #127DFF 88%, #036BFC 100%);
+            color: white;
+            padding: 3px 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 13px;
+            text-shadow: 1px 1px 2px #0F1089;
+            user-select: none;
+        }
+
+        /* Title Bar Control Buttons (Minimize, Maximize, Close) */
+        .xp-controls {
+            display: flex;
+            gap: 2px;
+        }
+
+        .xp-ctrl-btn {
+            width: 21px;
+            height: 21px;
+            border: 1px solid white;
+            border-radius: 3px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: default;
+            box-shadow: inset 0 -2px 3px rgba(0,0,0,0.2);
+        }
+
+        .xp-close {
+            background: linear-gradient(to bottom, #e38275 0%, #d4594c 30%, #c9402f 50%, #c92f23 100%);
+            border-color: #f7ebe9;
+        }
+
+        .xp-min, .xp-max {
+            background: linear-gradient(to bottom, #69a7f0 0%, #3a7eed 30%, #206bed 50%, #105aed 100%);
+            border-color: #d1e4fb;
+        }
+
+        /* Window Content Area */
+        .xp-content {
+            padding: 16px;
+            flex: 1;
+            border: 1px solid #fff; /* Inner bevel */
+            border-right: none;
+            border-bottom: none;
+        }
+
+        /* Fieldset / Group Boxes */
+        .xp-group {
+            border: 1px solid #D3D3D3;
+            border-radius: 3px;
+            padding: 12px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .xp-group legend {
+            color: #0033BC;
+            background: #ECE9D8;
+            padding: 0 4px;
+            position: absolute;
+            top: -9px;
+            left: 8px;
+            font-size: 12px;
+        }
+
+        /* Beveled Buttons */
+        .xp-button {
+            background: linear-gradient(to bottom, #F2F2F2, #EBEBEB 45%, #DDDDDD 50%, #CFCFCF);
+            border: 1px solid #707070;
+            border-radius: 3px;
+            color: black;
+            font-family: 'Tahoma', sans-serif;
+            font-size: 12px;
+            padding: 4px 12px;
+            cursor: pointer;
+            box-shadow: inset 0 0 1px #FFF;
+            transition: all 0.1s;
+        }
+
+        .xp-button:active {
+            background: linear-gradient(to bottom, #CFCFCF, #DDDDDD 45%, #EBEBEB 50%, #F2F2F2);
+            border-color: #333;
+            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.2);
+            padding-top: 5px;
+            padding-bottom: 3px;
+        }
+
+        .xp-button:focus {
+            outline: 1px dotted black;
+            outline-offset: -4px;
+            border-color: #0033BC;
+        }
+
+        /* Dropdowns */
+        .xp-select {
+            border: 1px solid #7F9DB9;
+            padding: 2px;
+            font-family: 'Tahoma', sans-serif;
+            font-size: 12px;
+            background: white;
+        }
+
+        /* Command Prompt styling */
+        .cmd-window {
+            background-color: black;
+            color: #C0C0C0;
+            font-family: 'Consolas', 'Lucida Console', monospace;
+            font-size: 14px;
+            overflow-y: auto;
+            padding: 8px;
+            height: 300px;
+            border: inset 2px #fff;
+        }
+
+        .cmd-window::-webkit-scrollbar {
+            width: 16px;
+            background-color: #ECE9D8;
+            border-left: 1px solid #716F64;
+        }
+        
+        .cmd-window::-webkit-scrollbar-button {
+            background-color: #ECE9D8;
+            height: 16px;
+            border: 1px solid #716F64;
+            box-shadow: inset 1px 1px 0 #FFF, inset -1px -1px 0 #ACA899;
+        }
+
+        .cmd-window::-webkit-scrollbar-thumb {
+            background-color: #CFCFCF;
+            border: 1px solid #716F64;
+            box-shadow: inset 1px 1px 0 #FFF, inset -1px -1px 0 #ACA899;
+        }
+    </style>
+</head>
+
+<body class="p-4 md:p-8 flex items-start justify-center h-full">
+
+    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        
+        <!-- Plate Loader Control Panel (Left) -->
+        <div class="xp-window">
+            <div class="xp-titlebar">
+                <div class="flex items-center gap-1">
+                    <img src="https://img.icons8.com/color/16/000000/processor.png" alt="icon" class="mr-1">
+                    Plate Loader Control Panel
+                </div>
+                <div class="xp-controls">
+                    <div class="xp-ctrl-btn xp-min">_</div>
+                    <div class="xp-ctrl-btn xp-max">□</div>
+                    <div class="xp-ctrl-btn xp-close">X</div>
+                </div>
+            </div>
+            
+            <div class="xp-content">
+                
+                <!-- System Commands -->
+                <div class="xp-group mt-2">
+                    <legend>System Commands</legend>
+                    <div class="flex gap-2">
+                        <button class="xp-button" onclick="sendCommand('STATUS')">STATUS</button>
+                        <button class="xp-button" onclick="sendCommand('RESET')">RESET</button>
+                        <button class="xp-button text-red-700" onclick="sendCommand('EXIT')">EXIT</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                    <!-- X-AXIS -->
+                    <div class="xp-group mt-2">
+                        <legend>X-AXIS</legend>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs">Position:</span>
+                            <select id="x-axis-val" class="xp-select flex-1">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                            <button class="xp-button" onclick="sendPromptedCommand('X-AXIS', document.getElementById('x-axis-val').value)">Send</button>
+                        </div>
+                    </div>
+
+                    <!-- Z-AXIS -->
+                    <div class="xp-group mt-2">
+                        <legend>Z-AXIS</legend>
+                        <div class="flex items-center gap-2">
+                            <button class="xp-button flex-1" onclick="sendPromptedCommand('Z-AXIS', 'EXTEND')">EXTEND</button>
+                            <button class="xp-button flex-1" onclick="sendPromptedCommand('Z-AXIS', 'RETRACT')">RETRACT</button>
+                        </div>
+                    </div>
+
+                    <!-- GRIPPER -->
+                    <div class="xp-group mt-2">
+                        <legend>GRIPPER</legend>
+                        <div class="flex items-center gap-2">
+                            <button class="xp-button flex-1" onclick="sendPromptedCommand('GRIPPER', 'OPEN')">OPEN</button>
+                            <button class="xp-button flex-1" onclick="sendPromptedCommand('GRIPPER', 'CLOSE')">CLOSE</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MOVE ROUTINE -->
+                <div class="xp-group mt-4">
+                    <legend>MOVE Routine</legend>
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs">Start Pos:</span>
+                            <select id="move-start" class="xp-select w-16">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs">End Pos:</span>
+                            <select id="move-end" class="xp-select w-16">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5" selected>5</option>
+                            </select>
+                        </div>
+                        <button class="xp-button ml-auto px-6 font-bold" onclick="sendMove()">Execute Move</button>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Command Prompt Window (Right) -->
+        <div class="xp-window">
+            <div class="xp-titlebar">
+                <div class="flex items-center gap-1">
+                    <img src="https://img.icons8.com/color/16/000000/console.png" alt="icon" class="mr-1">
+                    C:\WINDOWS\system32\cmd.exe - ssh pi@plate-loader
+                </div>
+                <div class="xp-controls">
+                    <div class="xp-ctrl-btn xp-min">_</div>
+                    <div class="xp-ctrl-btn xp-max">□</div>
+                    <div class="xp-ctrl-btn xp-close">X</div>
+                </div>
+            </div>
+            
+            <div class="xp-content !p-0">
+                <div id="cmd-output" class="cmd-window">
+                    <div>Microsoft Windows XP [Version 5.1.2600]</div>
+                    <div>(C) Copyright 1985-2001 Microsoft Corp.</div>
+                    <br>
+                    <div>C:\Documents and Settings\User> ssh pi@plate-loader.local</div>
+                    <div>pi@plate-loader.local's password:</div>
+                    <div>Connected to Plate Loader Controller V1.0</div>
+                    <div>Awaiting commands...</div>
+                    <br>
+                    <div id="cmd-prompt-line">
+                        <span id="cmd-history"></span>
+                        <span class="text-white">pi@plate-loader:~$ <span id="typing-cursor" class="animate-pulse bg-gray-400 w-2 h-4 inline-block align-middle"></span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cmdHistory = document.getElementById('cmd-history');
+        const cmdOutput = document.getElementById('cmd-output');
+        const cmdPromptLine = document.getElementById('cmd-prompt-line');
+        const delayBetweenInputs = 500; // MS delay to simulate human/script interaction
+
+        function scrollToBottom() {
+            cmdOutput.scrollTop = cmdOutput.scrollHeight;
+        }
+
+        function printLog(text) {
+            // Append line to history before the current prompt line
+            const newLine = document.createElement('div');
+            newLine.textContent = text;
+            cmdHistory.appendChild(newLine);
+            scrollToBottom();
+        }
+
+        function printInput(text) {
+            // Simulate typing a command
+            const newLine = document.createElement('div');
+            newLine.innerHTML = `pi@plate-loader:~$ <span class="text-white">${text}</span>`;
+            cmdHistory.appendChild(newLine);
+            scrollToBottom();
+        }
+
+        // Send a direct single command
+        function sendCommand(cmd) {
+            printInput(cmd);
+            setTimeout(() => {
+                printLog(`Executing ${cmd}...`);
+                if (cmd === 'STATUS') {
+                    printLog(`[OK] All systems nominal. X:1 Z:RETRACTED G:CLOSED`);
+                } else if (cmd === 'EXIT') {
+                    printLog(`Closing connection...`);
+                } else if (cmd === 'RESET') {
+                    printLog(`[OK] System homed and reset.`);
+                }
+            }, delayBetweenInputs);
+        }
+
+        // Send a command that expects a single follow-up parameter
+        function sendPromptedCommand(cmd, param) {
+            printInput(cmd);
+            
+            setTimeout(() => {
+                if (cmd === 'X-AXIS') printLog(`Enter target position (1-5):`);
+                else if (cmd === 'Z-AXIS') printLog(`Enter action (EXTEND/RETRACT):`);
+                else if (cmd === 'GRIPPER') printLog(`Enter action (OPEN/CLOSE):`);
+                
+                setTimeout(() => {
+                    const paramLine = document.createElement('div');
+                    paramLine.innerHTML = `<span class="text-white">${param}</span>`;
+                    cmdHistory.appendChild(paramLine);
+                    
+                    setTimeout(() => {
+                        printLog(`[OK] ${cmd} set to ${param}`);
+                        scrollToBottom();
+                    }, delayBetweenInputs);
+                    
+                }, delayBetweenInputs);
+            }, delayBetweenInputs);
+        }
+
+        // Multi-step move command simulation
+        function sendMove() {
+            const start = document.getElementById('move-start').value;
+            const end = document.getElementById('move-end').value;
+            
+            printInput('MOVE');
+            
+            setTimeout(() => {
+                printLog(`Enter start position (1-5):`);
+                
+                setTimeout(() => {
+                    const startLine = document.createElement('div');
+                    startLine.innerHTML = `<span class="text-white">${start}</span>`;
+                    cmdHistory.appendChild(startLine);
+                    
+                    setTimeout(() => {
+                        printLog(`Enter end position (1-5):`);
+                        
+                        setTimeout(() => {
+                            const endLine = document.createElement('div');
+                            endLine.innerHTML = `<span class="text-white">${end}</span>`;
+                            cmdHistory.appendChild(endLine);
+                            
+                            setTimeout(() => {
+                                printLog(`[OK] Moving from ${start} to ${end}...`);
+                                setTimeout(() => printLog(`[OK] Move complete.`), 1000);
+                            }, delayBetweenInputs);
+                            
+                        }, delayBetweenInputs);
+                        
+                    }, delayBetweenInputs);
+                    
+                }, delayBetweenInputs);
+                
+            }, delayBetweenInputs);
+        }
+    </script>
+</body>
+</html>

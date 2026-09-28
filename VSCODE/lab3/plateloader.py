@@ -18,15 +18,15 @@ class PlateLoader:
         if self.ser and self.ser.is_open:
             self.ser.close()
 
-    def send_command(self, command):
+    def send_commands(self, command):
         self.ser.reset_input_buffer()
         message_bytes = (command + "\n").encode()
-        print(message_bytes)
+        #print(message_bytes)
 
         self.ser.write(message_bytes)
 
         response_bytes = self.ser.readline()
-        print(response_bytes)
+        #print(response_bytes)
         response = response_bytes.decode().strip()
         print(response)
         return response

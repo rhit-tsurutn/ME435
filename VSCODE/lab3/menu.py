@@ -1,45 +1,39 @@
 import plateloader
 
 def main():
-    print("Serial Menu")
-    loader = plateloader.PlateLoader("/dev/ttyUSB0")
+    options = ["EXIT", "RESET", "X-AXIS", "GRIPPER", "Z-AXIS", "STATUS", "MOVE"]
+    loader = plateloader.PlateLoader()
     loader.connect()
-    # loader = plateloader.PlateLoader()
-    print("0. Exit")
-    print("1. RESET")
-    print("2. X-AXIS")
-    print("3. GRIPPER")
-    print("4. Z-AXIS")
-    print("5. MOVE")
-    print("6. Status")
+    for i, option in enumerate(options):
+        print(f"{i}: {option}")
     while True:
-        selection = int(input("Selection: "))
-        if selection == 0:
+        selection = int(input("Select a Command: "))
+        if(selection == 0):
             break
-        elif selection == 1:
-            response = loader.send_command("RESET")
-            print(response)
-        elif selection == 2:
-            response = loader.send_command("X-AXIS")
-            print(response)
-        elif selection == 3:
-            response = loader.send_command("GRIPPER")
-            print(response)
-        elif selection == 4:
-            response = loader.send_command("Z-AXIS")
-            print(response)
-        elif selection == 5:
-            response = loader.send_command("MOVE")
-            print(response)
-        elif selection == 6:
-            response = loader.send_command("LOADER_STATUS")
-            print(response)
+        if(selection == 1):
+            resp = loader.send_commands("RESET")
+            print("response: ", resp)
+        if(selection == 2):
+            selection = int(input("Select a position (1 - 5): "))
+            resp = loader.send_commands(f"X-AXIS {selection}")
+            print("response: ", resp)
+        if(selection == 3):
+            selection = input("Enter OPEN or CLOSE: ").strip()
+            resp = loader.send_commands(f'GRIPPER {selection}')
+            print("response: ", resp)
+        if(selection == 4):
+            selection = input("Enter EXTEND or RETRACT: ").strip()
+            resp = loader.send_commands(f'Z-AXIS {selection}')
+            print("response: ", resp)
+        if(selection == 5):
+            resp = loader.send_commands("STATUS")
+            print("response: ", resp)
+        if(selection == 6):
+            start = int(input("Select a start position (1 - 5): "))
+            end = int(input("Select an end position (1 - 5): "))
+            resp = loader.send_commands(f'MOVE {start} {end}')
+            print("response: ", resp)
 
     loader.disconnect()
-    print("Goodbye")
-    
-
-
-
 
 main()

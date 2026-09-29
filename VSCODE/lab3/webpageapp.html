@@ -359,7 +359,7 @@
                     throw new Error(`Response status: ${response.status}`);
                 }
                 let responseData = await response.text();
-                console.log(responseData);
+                printInput(responseData);
             }
             catch (ex) {
                 console.error(ex);
@@ -369,24 +369,12 @@
         // Send a command that expects a single follow-up parameter
         function sendPromptedCommand(cmd, param) {
             printInput(cmd);
+                const paramLine = document.createElement('div');
+                paramLine.innerHTML = `<span class="text-white">${param}</span>`;
+                cmdHistory.appendChild(paramLine);
             
-            setTimeout(() => {
-                if (cmd === 'X-AXIS') printLog(`Enter target position (1-5):`);
-                else if (cmd === 'Z-AXIS') printLog(`Enter action (EXTEND/RETRACT):`);
-                else if (cmd === 'GRIPPER') printLog(`Enter action (OPEN/CLOSE):`);
-                
-                setTimeout(() => {
-                    const paramLine = document.createElement('div');
-                    paramLine.innerHTML = `<span class="text-white">${param}</span>`;
-                    cmdHistory.appendChild(paramLine);
-                    
-                    setTimeout(() => {
-                        let response = sendCommand(`${cmd}/${param}`);
-                        scrollToBottom();
-                    }, delayBetweenInputs);
-                    
-                }, delayBetweenInputs);
-            }, delayBetweenInputs);
+                let response = sendCommand(`${cmd}/${param}`);
+                scrollToBottom();
         }
 
         // Multi-step move command simulation
@@ -396,16 +384,12 @@
             
             printInput('MOVE');
             
-            setTimeout(() => {
-                printLog(`Enter start position (1-5):`);
                 
                 setTimeout(() => {
                     const startLine = document.createElement('div');
                     startLine.innerHTML = `<span class="text-white">${start}</span>`;
                     cmdHistory.appendChild(startLine);
-                    
-                    setTimeout(() => {
-                        printLog(`Enter end position (1-5):`);
+        
                         
                         setTimeout(() => {
                             const endLine = document.createElement('div');
@@ -417,14 +401,10 @@
                                 let response = sendCommand(`MOVE/${start}/${end}`);
                                 setTimeout(() => printLog(response), 1000);
                             }, delayBetweenInputs);
-                            
                         }, delayBetweenInputs);
+        }, delayBetweenInputs);
                         
-                    }, delayBetweenInputs);
-                    
-                }, delayBetweenInputs);
-                
-            }, delayBetweenInputs);
+
         }
     </script>
 </body>

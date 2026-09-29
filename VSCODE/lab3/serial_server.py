@@ -12,13 +12,14 @@ loader = plateloader.PlateLoader() # TODO: Set the port if needed.
 def handle_naked_domain():
     return flask.redirect("/index.html")
 
-app.get("/api/<command>")
-def handle_plateloader_commands(command):
-    response = loader.send_command(command)
-    return "Success"
+@app.get("/api/<command>")
+def handle_plateloader_command(command):
+    with serial_lock:
+        response = loader.send_command(command)
+    return response
 
 
 if __name__ == '__main__':
     print("Running flask!")
     loader.connect()
-    app.run(host="0.0.0.0", port=8080, use_reloader=False)
+    app.run(host="0.0.0.0", port=8082, use_reloader=False)

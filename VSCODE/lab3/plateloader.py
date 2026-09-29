@@ -28,7 +28,7 @@ class PlateLoader:
         response_bytes = self.ser.readline()
         #print(response_bytes)
         response = response_bytes.decode().strip()
-        print(response)
+        # print(response)
         return response
 
 
@@ -36,6 +36,6 @@ if __name__ == "__main__":
     print("Quick PlateLoader testing")
     loader = PlateLoader()
     loader.connect()
-    response = loader.send_command("TEST")
+    response = loader.send_commands("RESET")
     print("Response: ", response)
     loader.disconnect()

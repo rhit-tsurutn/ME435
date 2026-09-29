@@ -310,6 +310,11 @@
         const cmdPromptLine = document.getElementById('cmd-prompt-line');
         const delayBetweenInputs = 500; // MS delay to simulate human/script interaction
 
+        window.addEventListener("load", (event) => {
+            console.log("event occurred: " + event);
+            console.log("page is fully loaded");
+        });
+
         function scrollToBottom() {
             cmdOutput.scrollTop = cmdOutput.scrollHeight;
         }
@@ -331,18 +336,34 @@
         }
 
         // Send a direct single command
-        function sendCommand(cmd) {
+        async function sendCommand(cmd) {
             printInput(cmd);
-            setTimeout(() => {
-                printLog(`Executing ${cmd}...`);
-                if (cmd === 'STATUS') {
-                    printLog(`[OK] All systems nominal. X:1 Z:RETRACTED G:CLOSED`);
-                } else if (cmd === 'EXIT') {
-                    printLog(`Closing connection...`);
-                } else if (cmd === 'RESET') {
-                    printLog(`[OK] System homed and reset.`);
+                //printLog(`Executing ${cmd}...`);
+                // if (cmd === 'STATUS') {
+                //     printLog(`[OK] All systems nominal. X:1 Z:RETRACTED G:CLOSED`);
+                // } else if (cmd === 'EXIT') {
+                //     printLog(`Closing connection...`);
+                // } else if (cmd === 'RESET') {
+                //     printLog(`[OK] System homed and reset.`);
+                // }
+            let options = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'text/plain'
                 }
-            }, delayBetweenInputs);
+                };
+            console.log(`Sending command: /api/${cmd}`);
+            try {
+            let response = await fetch("/api/" + cmd, options)
+                if (!response.ok) {
+                    throw new Error(`Response status: ${response.status}`);
+                }
+                let responseData = await response.text();
+                console.log(responseData);
+            }
+            catch (ex) {
+                console.error(ex);
+            }
         }
 
         // Send a command that expects a single follow-up parameter
@@ -360,7 +381,7 @@
                     cmdHistory.appendChild(paramLine);
                     
                     setTimeout(() => {
-                        printLog(`[OK] ${cmd} set to ${param}`);
+                        let response = sendCommand(`${cmd}/${param}`);
                         scrollToBottom();
                     }, delayBetweenInputs);
                     
@@ -393,7 +414,8 @@
                             
                             setTimeout(() => {
                                 printLog(`[OK] Moving from ${start} to ${end}...`);
-                                setTimeout(() => printLog(`[OK] Move complete.`), 1000);
+                                let response = sendCommand(`MOVE/${start}/${end}`);
+                                setTimeout(() => printLog(response), 1000);
                             }, delayBetweenInputs);
                             
                         }, delayBetweenInputs);

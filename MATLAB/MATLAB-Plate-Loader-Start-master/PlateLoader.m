@@ -1,9 +1,9 @@
 classdef PlateLoader < hgsetget
-    %PLATELOADER Controls the Beckman Coulter Plate Loader Robot
-    %   Performs the basic actions to control the plate loader
-
+    % PLATELOADER Controls the Beckman Coulter Plate Loader Robot via Flask API
+    
     properties
-        serialRobot
+        baseUrl
+        options
         xAxisPosition
         isZAxisExtended
         isGripperClosed
@@ -16,133 +16,124 @@ classdef PlateLoader < hgsetget
             0 30 30 0 0
             0 30 20 60 0];
     end
-
+    
     methods
-        function obj = PlateLoader(portNumber)
-            % Construct a PlateLoader Object
-            portStr = sprintf('COM%d',portNumber);
+        function obj = PlateLoader(portNumberOrIP)
 
-%            portStr = '/dev/cu.usbserial-110'; % ignore the portNumber for my Mac
-
-            obj.serialRobot = serialport(portStr, 19200, 'Timeout', 15);
-            writeline(obj.serialRobot,'INITIALIZE');
-            response = readline(obj.serialRobot);
-            % Had to print the response since a construct cannot return mulitple items
-            fprintf('%s\n', response);
+            if isnumeric(portNumberOrIP)
+                pi_ip = '192.168.1.100'; % REPLACE WITH PI IP
+            else
+                pi_ip = portNumberOrIP;
+            end
+            
+            obj.baseUrl = sprintf('http://%s:8080', pi_ip); % MAKE SURE USING 8080 
+            obj.options = weboptions('Timeout', 15);
+            
+            try
+                response = string(webread(sprintf('%s/api/RESET', obj.baseUrl), obj.options));
+                fprintf('Connected to Flask: %s\n', response);
+            catch
+                fprintf('WARNING: Could not connect to Flask server at %s\n', obj.baseUrl);
+            end
+            
             obj.xAxisPosition = 3;
             obj.isZAxisExtended = false;
             obj.isGripperClosed = true;
-            % TODO: When turned on there might be a plate present
-            %   Can someone add code to get Plate status
-            %   Maybe use the GRIPPER_STATUS command and ready string reply
             obj.isPlatePresent = false;
         end
+        
         function response = specialMove(obj)
-            writeline(obj.serialRobot,'X-AXIS 1');
-            readline(obj.serialRobot);
-            writeline(obj.serialRobot,'GRIPPER OPEN');
-            readline(obj.serialRobot);
-            writeline(obj.serialRobot,'Z-AXIS EXTEND');
-            readline(obj.serialRobot);
-            writeline(obj.serialRobot,'GRIPPER CLOSE');
-            readline(obj.serialRobot);
-            writeline(obj.serialRobot,'Z-AXIS RETRACT');
-            readline(obj.serialRobot);
-            writeline(obj.serialRobot,'X-AXIS 3');
-            readline(obj.serialRobot);
-            writeline(obj.serialRobot,'Z-AXIS EXTEND');
-            readline(obj.serialRobot);
-            writeline(obj.serialRobot,'GRIPPER OPEN');
-            readline(obj.serialRobot);
-            writeline(obj.serialRobot,'Z-AXIS RETRACT');
-            readline(obj.serialRobot);
-            writeline(obj.serialRobot,'GRIPPER CLOSE');
-            readline(obj.serialRobot);
-            writeline(obj.serialRobot,'X-AXIS 5');
-            readline(obj.serialRobot);
-            writeline(obj.serialRobot,'GRIPPER OPEN');
-            readline(obj.serialRobot);
-            writeline(obj.serialRobot,'Z-AXIS EXTEND');
-            readline(obj.serialRobot);
-            writeline(obj.serialRobot,'GRIPPER CLOSE');
-            readline(obj.serialRobot);
-            writeline(obj.serialRobot,'Z-AXIS RETRACT');
-            readline(obj.serialRobot);
-            writeline(obj.serialRobot,'X-AXIS 3');
-            readline(obj.serialRobot);
-            writeline(obj.serialRobot,'GRIPPER OPEN');
-            readline(obj.serialRobot);
+            % Executes special move routine over HTTP
+            obj.x(1);
+            obj.open();
+            obj.extend();
+            obj.close();
+            obj.retract();
+            obj.x(3);
+            obj.extend();
+            obj.open();
+            obj.retract();
+            obj.close();
+            obj.x(5);
+            obj.open();
+            obj.extend();
+            obj.close();
+            obj.retract();
+            obj.x(3);
+            obj.open();
             response = 'READY';
         end
+        
         function response = reset(obj)
-            % Reset robot
-            writeline(obj.serialRobot,'RESET');
+            url = sprintf('%s/api/RESET', obj.baseUrl);
+            response = string(webread(url, obj.options));
+            
             obj.xAxisPosition = 3;
             obj.isZAxisExtended = false;
             obj.isGripperClosed = true;
-            response = readline(obj.serialRobot);
         end
+        
         function response = x(obj,pos)
-            % Moves the x-axis to position, passes the reply back to caller
-            if (pos <1 || pos>5)
+            if (pos < 1 || pos > 5)
                 fprintf('Illegal position\n');
                 return
             end
-            xCommand = sprintf('X-AXIS %d',pos);
-            writeline(obj.serialRobot,xCommand);
+            
+            url = sprintf('%s/api/X-AXIS/%d', obj.baseUrl, pos);
+            response = string(webread(url, obj.options));
+            
             if(obj.xAxisPosition ~= pos)
                 obj.isZAxisExtended = false;
             end
             obj.xAxisPosition = pos;
-            response = readline(obj.serialRobot);
         end
+        
         function response = extend(obj)
-            % Extends the Z-Axis, passes the reply back to caller
-            writeline(obj.serialRobot,'Z-AXIS EXTEND');
-            response = readline(obj.serialRobot);
-
+            url = sprintf('%s/api/Z-AXIS/EXTEND', obj.baseUrl);
+            response = string(webread(url, obj.options));
+            
             if startsWith(response, "ERROR")
                 obj.isZAxisExtended = false;
             else
                 obj.isZAxisExtended = true;
             end
         end
+        
         function response = retract(obj)
-            % Retracts the Z-Axis, passes the reply back to caller
-            writeline(obj.serialRobot,'Z-AXIS RETRACT');
+            url = sprintf('%s/api/Z-AXIS/RETRACT', obj.baseUrl);
+            response = string(webread(url, obj.options));
             obj.isZAxisExtended = false;
-            response = readline(obj.serialRobot);
         end
+        
         function response = close(obj)
-            % Close Gripper, passes the reply back to caller
-            writeline(obj.serialRobot,'GRIPPER CLOSE');
+            url = sprintf('%s/api/GRIPPER/CLOSE', obj.baseUrl);
+            response = strtrim(string(webread(url, obj.options)));
+            
             obj.isGripperClosed = true;
-            response = strtrim(readline(obj.serialRobot))
             if endsWith(response, "NOPLATE")
                 obj.isPlatePresent = false;
             else
                 obj.isPlatePresent = true;
             end
         end
+        
         function response = open(obj)
-            % Open Gripper, passes the reply back to caller
-            writeline(obj.serialRobot,'GRIPPER OPEN');
+            url = sprintf('%s/api/GRIPPER/OPEN', obj.baseUrl);
+            response = string(webread(url, obj.options));
+            
             obj.isGripperClosed = false;
             obj.isPlatePresent = false;
-            response = readline(obj.serialRobot);
         end
+        
         function response = movePlate(obj, startPos, endPos)
-            % movePlate(startPos, endPos)- Passes two MATLAB numbers for the
-            % start and end position of the plate, tries to move the plate to
-            % that position, and passes the reply back to caller
-            if (startPos <1 || startPos>5 || endPos <1 || endPos>5)
+            if (startPos < 1 || startPos > 5 || endPos < 1 || endPos > 5)
                 fprintf('Illegal position\n');
                 return
             end
-            moveCommand = sprintf('MOVE %d %d',startPos,endPos);
-            writeline(obj.serialRobot,moveCommand);
-
-            response = readline(obj.serialRobot);
+            
+            url = sprintf('%s/api/MOVE/%d/%d', obj.baseUrl, startPos, endPos);
+            response = string(webread(url, obj.options));
+            
             if startsWith(response, "ERROR")
                 obj.xAxisPosition = startPos;
                 obj.isZAxisExtended = false;
@@ -155,9 +146,8 @@ classdef PlateLoader < hgsetget
                 obj.isPlatePresent = false;
             end
         end
+        
         function response = setTimeValues(obj,timeDelays)
-            % setTimeValues(timeDelays) - Passes a matrix with 5 rows (froms)
-            % and 5 columns (tos) to set all the time delay value
             if (size(timeDelays) ~= [5 5])
                 fprintf('Need a 5 by 5 matrix of time delays\n');
                 return
@@ -165,49 +155,46 @@ classdef PlateLoader < hgsetget
             for i = 1:5
                 for j = 2:4
                     if(i ~= j)
-                        timeCommand = sprintf('SET_DELAY %d %d %d', i,j,timeDelays(i,j));
-                        writeline(obj.serialRobot,timeCommand);
-                        response = readline(obj.serialRobot);
-                        fprintf('%s\n', response);
+                        % assumes flask route exists for set_delay
+                        url = sprintf('%s/api/SET_DELAY/%d/%d/%d', obj.baseUrl, i, j, timeDelays(i,j));
+                        try
+                            response = string(webread(url, obj.options));
+                            fprintf('%s\n', response);
+                        catch
+                            fprintf('Warning: Failed to set delay. Ensure SET_DELAY route exists on Flask.\n');
+                        end
                     end
                 end
             end
         end
+        
         function response = resetDefaultTimes(obj)
-            % Resets the default time delay table values
             response = obj.setTimeValues(obj.defaultTimeTable);
         end
+        
         function response = getStatus(obj)
-            % Since we are keeping the status as instance fields we can just
-            % get the properties of the class, this is a useful double check
-            % TODO: Make the values update if different
-            %  Can someone make the call to LOADED_STATUS also update
-            %  properties, just in case somehow it gets off
-            writeline(obj.serialRobot,'LOADER_STATUS');
-            response = readline(obj.serialRobot);
+            url = sprintf('%s/api/STATUS', obj.baseUrl);
+            response = string(webread(url, obj.options));
         end
-
-        % Other to todo's if someone wants to.  Implement the additional
-        %  weird commands: STOP_CYLINDER, VERSION,
-        %  X-AXIS_STATUS, Z-AXIS_STATUS, GRIPPER_STATUS
-
+        
         function [xPos,zAxis,grip,plate] = getProperties(obj)
-            % Returns the status properties of the robot (for GUI display)
             xPos = obj.xAxisPosition;
             zAxis = obj.isZAxisExtended;
             grip = obj.isGripperClosed;
             plate = obj.isPlatePresent;
         end
+        
         function response = shutdown(obj)
-            % Close serial object
-            delete(obj.serialRobot);
-            obj.serialRobot = [];
+            url = sprintf('%s/api/EXIT', obj.baseUrl);
+            try
+                webread(url, obj.options);
+            catch
+                
+            end
             response = 'Disconnected';
         end
+        
         function disp(obj)
-            % Overrides the display when seeing robot status
-            % Note: if you need to see the field names use
-            %    get(_objectName_)
             fprintf('  X-AXIS %d, ',obj.xAxisPosition);
             if (obj.isZAxisExtended)
                 fprintf('EXTENDED, ');

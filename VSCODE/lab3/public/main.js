@@ -14,6 +14,7 @@ function main() {
     console.log("Hello JavaScript!");
     // document.querySelector("#reset").innerHTML = "Hello";
 
+    
     document.querySelector("#reset").onclick = () => {
         console.log("You pressed the reset button!");
         sendCommand("RESET");

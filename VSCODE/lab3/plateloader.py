@@ -3,7 +3,7 @@ import time
 
 
 class PlateLoader:
-    def __init__(self, port="/dev/ttyUSB0"):
+    def __init__(self, port="COM3"):
         self.port = port
         self.ser = None
 

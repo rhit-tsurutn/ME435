@@ -7,7 +7,6 @@ app.jointAngles = [0 0 0 0 0 0]; % Start at the zero angle position.
 %  End : Setup for this stand alone version that will NOT go into the GUI.
 
 
-
 % Begin: Code that can go into your GUI's StartupFcn.
 clc
 
@@ -22,29 +21,29 @@ app.axes_arm.Visible = 'off';
 % app.axes_arm.ZLim = [-22 22];
 
 % Create vertices for all the patches
-makeStlLink("AdeeptL0.stl", app.axes_arm, [.2 .2 .2]);  % Doesn't move. No need to save a handle to it.
+makeStlLink("ABBL0.stl", app.axes_arm, [.2 .2 .2]);  % Doesn't move. No need to save a handle to it.
 % Save references to the vertices of each patch, make points 4x1 not 3x1.
-app.link1Patch = makeStlLink("AdeeptL1.stl", app.axes_arm, [112/255 198/255 210/255]);
+app.link1Patch = makeStlLink("ABBL1.stl", app.axes_arm, [112/255 198/255 210/255]);
 app.link1Vertices = get(app.link1Patch, 'Vertices')';
 app.link1Vertices(4,:) = ones(1, size(app.link1Vertices,2));
 
-app.link2Patch = makeStlLink("AdeeptL2.stl", app.axes_arm, [198/255 172/255 20/255]);
+app.link2Patch = makeStlLink("ABBL2.stl", app.axes_arm, [198/255 172/255 20/255]);
 app.link2Vertices = get(app.link2Patch, 'Vertices')';
 app.link2Vertices(4,:) = ones(1, size(app.link2Vertices,2));
 
-app.link3Patch = makeStlLink("AdeeptL3.stl", app.axes_arm, [181/255 24/255 35/255]);
+app.link3Patch = makeStlLink("ABBL3.stl", app.axes_arm, [181/255 24/255 35/255]);
 app.link3Vertices = get(app.link3Patch, 'Vertices')';
 app.link3Vertices(4,:) = ones(1, size(app.link3Vertices,2));
 
-app.link4Patch = makeStlLink("AdeeptL4.stl", app.axes_arm, [181/255 24/255 35/255]);
+app.link4Patch = makeStlLink("ABBL4.stl", app.axes_arm, [181/255 24/255 35/255]);
 app.link4Vertices = get(app.link4Patch, 'Vertices')';
 app.link4Vertices(4,:) = ones(1, size(app.link4Vertices,2));
 
-app.link5Patch = makeStlLink("AdeeptL5.stl", app.axes_arm, [181/255 24/255 35/255]);
+app.link5Patch = makeStlLink("ABBL5.stl", app.axes_arm, [181/255 24/255 35/255]);
 app.link5Vertices = get(app.link5Patch, 'Vertices')';
 app.link5Vertices(4,:) = ones(1, size(app.link5Vertices,2));
 
-app.link6Patch = makeStlLink("AdeeptL6.stl", app.axes_arm, [181/255 24/255 35/255]);
+app.link6Patch = makeStlLink("ABBL6.stl", app.axes_arm, [181/255 24/255 35/255]);
 app.link6Vertices = get(app.link6Patch, 'Vertices')';
 app.link6Vertices(4,:) = ones(1, size(app.link6Vertices,2));
 

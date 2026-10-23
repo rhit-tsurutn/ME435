@@ -1,0 +1,39 @@
+import gpiozero as gz
+import time
+import signal
+
+def button():
+    button = gz.Button(25)
+    leds = gz.LEDBoard(14, 15, 18, pwm=True)
+    while True:
+        if(button.is_pressed):
+            leds.value = [0.75, 0.5, 0.25]
+        else:
+            leds.off()
+        time.sleep(1)
+
+
+def fancy_leds():
+    leds = gz.LEDBoard(14, 15, 18, pwm=True)
+    leds.value = [0.75, 0.5, 0.25]
+    signal.pause()
+
+def basic_on_off():
+    green_led = gz.DigitalOutputDevice(14)
+    green_led.on()
+    time.sleep(3)
+    green_led.off()
+    green_led.blink(0.5, 1.5)
+    signal.pause()
+
+def helper(board, val):
+    board.value=val
+
+def button_events():
+    button = gz.Button(25)
+    leds = gz.LEDBoard(14, 15, 18, pwm=True)
+    button.when_pressed = lambda: helper(leds, [0.5,1,0.5])
+
+def main():
+    fancy_leds()
+main()

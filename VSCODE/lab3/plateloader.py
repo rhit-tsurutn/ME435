@@ -3,7 +3,7 @@ import time
 
 
 class PlateLoader:
-    def __init__(self, port="COM3"):
+    def __init__(self, port="/dev/ttyUSB0"):
         self.port = port
         self.ser = None
 
@@ -36,6 +36,6 @@ if __name__ == "__main__":
     print("Quick PlateLoader testing")
     loader = PlateLoader()
     loader.connect()
-    response = loader.send_commands("RESET")
+    response = loader.send_command("RESET")
     print("Response: ", response)
     loader.disconnect()

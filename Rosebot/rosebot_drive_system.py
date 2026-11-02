@@ -27,6 +27,7 @@ class DriveSystem:
 
     def stop(self):
         self.set_speeds(0, 0, 0, 0)
+        time.sleep(0.25)
 
     def go_straight_for_seconds(self, seconds, speed):
         self.go(speed, speed)
@@ -44,11 +45,16 @@ class DriveSystem:
         self.stop()
 
     def spin_in_place_for_degrees(self, degrees, speed):
-        # degrees_per_second = inches_per_second / self.radius; # 2.8 = radius of turn
-        degrees_per_second = speed * 10
-        seconds = degrees/degrees_per_second
+        degrees_per_second = inches_per_second / self.radius; # 2.8 = radius of turn
+        # degrees_per_second = speed * 10
+        seconds = abs(degrees)/degrees_per_second
         print(seconds)
-        self.set_speeds(-speed, -speed, speed, speed)
+
+        # turn cw if deg is negative, ccw if positive
+        if degrees < 0:
+            self.set_speeds(speed, speed, -speed, -speed)
+        else:
+            self.set_speeds(-speed, -speed, speed, speed)
         time.sleep(seconds)
         self.stop()
     # s=r*theta

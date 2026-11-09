@@ -32,12 +32,12 @@ def main():
     app = App()
 
     try:
-        while True:
-            # Send test messages!
-            app.mqtt_client.send_message("set_speeds", [40, 40, 40, 40])
-            time.sleep(1)
-            app.mqtt_client.send_message("stop")
-            time.sleep(1)
+        # while True:
+        #     # Send test messages!
+        #     app.mqtt_client.send_message("set_speeds", [40, 40, 40, 40])
+        #     time.sleep(1)
+        #     app.mqtt_client.send_message("stop")
+        #     time.sleep(1)
 
         # signal.pause() # Keep the program alive but does noting.
     except KeyboardInterrupt:
